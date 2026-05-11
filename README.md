@@ -38,7 +38,7 @@ Navigate to `http://localhost:8080/h2-console`. JDBC URL: `jdbc:h2:mem:testdb`.
 
 ## Assumptions
 
-- Testcontainers is scaffolded for future integration tests that may require a containerized database or other services.
+- A manufacturer must exist before a beer can be created or updated. `manufacturerId` is validated server-side and returns a `404` problem detail if the referenced manufacturer does not exist. No upsert.
 
 ---
 
@@ -71,7 +71,11 @@ This API targets **[Richardson Maturity Model](https://martinfowler.com/articles
 Resources use `string/uuid` rather than sequential integers as public identifiers. This decouples the internal database identity from the API surface, prevents clients from inferring record counts or enumerating resources, and simplifies future federation or migration scenarios where sequential IDs would collide.
 
 #### Separate request and response schemas:
-`BeerRequest` and `Beer` are distinct schemas rather than a single reused type. The request schema carries validation constraints (`minLength`, `maximum`, etc.) and omits server-assigned fields; the response schema carries `id` and embedded related resources. This makes the contract explicit: clients cannot accidentally submit server-owned fields, and the two can evolve independently.
+Request and response schemas are always distinct types. Response schemas carry server-assigned fields (`id`, `createdAt`, `updatedAt`, embedded relations) marked `readOnly`; request schemas carry only client-supplied fields with validation constraints. This makes the contract explicit: clients cannot accidentally submit server-owned fields, and the two can evolve independently.
+
+#### Separate create and update request schemas:
+Each resource has a dedicated `CreateRequest` and `UpdateRequest` schema rather than a single shared request type. This allows create and update operations to diverge over time — for example, `manufacturerId` is required on `BeerCreateRequest` to associate a beer with an existing manufacturer at creation time, while future requirements may allow reassigning or locking it on updates. A single shared schema would force both operations to share the same constraints, making the contract less expressive and harder to evolve.
+
 
 #### Embedded manufacturer in Beer response:
 The `Manufacturer` is inlined into the `Beer` representation rather than returned as a link or ID reference. This avoids forcing clients to make a second request to resolve a manufacturer. Acceptable here because a beer without its manufacturer context is rarely useful on its own.

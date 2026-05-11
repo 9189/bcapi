@@ -53,7 +53,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BeerRequest'
+              $ref: '#/components/schemas/BeerCreateRequest'
       responses:
         '201':
           description: Beer created
@@ -104,7 +104,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BeerRequest'
+              $ref: '#/components/schemas/BeerUpdateRequest'
       responses:
         '200':
           description: Beer updated
@@ -177,7 +177,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ManufacturerRequest'
+              $ref: '#/components/schemas/ManufacturerCreateRequest'
       responses:
         '201':
           description: Manufacturer created
@@ -228,7 +228,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ManufacturerRequest'
+              $ref: '#/components/schemas/ManufacturerUpdateRequest'
       responses:
         '200':
           description: Manufacturer updated
@@ -267,11 +267,12 @@ components:
   schemas:
     Beer:
       type: object
-      required: [id, name, style, abv]
+      required: [id, name, style, abv, manufacturer]
       properties:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
           example: Zipfer Urquell
@@ -292,35 +293,39 @@ components:
           example: A crisp and refreshing lager.
         manufacturer:
           $ref: '#/components/schemas/Manufacturer'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
 
     Manufacturer:
       type: object
-      required: [id, name]
+      required: [id, name, originCountry]
       properties:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
         originCountry:
           type: string
-
-    ManufacturerRequest:
-      type: object
-      required: [name]
-      properties:
-        name:
+        createdAt:
           type: string
-          minLength: 1
-          maxLength: 100
-        originCountry:
+          format: date-time
+          readOnly: true
+        updatedAt:
           type: string
-          minLength: 1
-          maxLength: 100
+          format: date-time
+          readOnly: true
 
-    BeerRequest:
+    BeerCreateRequest:
       type: object
-      required: [name, style, abv]
+      required: [name, style, abv, manufacturerId]
       properties:
         name:
           type: string
@@ -338,6 +343,59 @@ components:
         description:
           type: string
           maxLength: 500
+        manufacturerId:
+          type: string
+          format: uuid
+
+    BeerUpdateRequest:
+      type: object
+      required: [name, style, abv, description, manufacturerId]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        style:
+          type: string
+          minLength: 1
+          maxLength: 50
+        abv:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+        description:
+          type: string
+          maxLength: 500
+        manufacturerId:
+          type: string
+          format: uuid
+
+    ManufacturerCreateRequest:
+      type: object
+      required: [name, originCountry]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        originCountry:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    ManufacturerUpdateRequest:
+      type: object
+      required: [name, originCountry]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        originCountry:
+          type: string
+          minLength: 1
+          maxLength: 100
 
     BeerPage:
       type: object
