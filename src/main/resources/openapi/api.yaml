@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Beer Catalogue API
+  description: API for managing a catalogue of beers.
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+tags:
+  - name: Beers
+    description: Beer catalogue operations
+  - name: Manufacturers
+    description: Beer manufacturer operations
+
+components:
+  schemas:
+    Beer:
+      type: object
+      required: [id, name, style, abv]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Zipfer Urquell
+        type:
+          type: string
+          x-extensible-enum:
+            - IPA
+            - Lager
+            - Stout
+          example: Lager
+        abv:
+          type: number
+          format: double
+          description: Alcohol by volume in percent
+          example: 4.8
+        description:
+          type: string
+          example: A crisp and refreshing lager.
+        manufacturer:
+          $ref: '#/components/schemas/Manufacturer'
+
+    Manufacturer:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        originCountry:
+          type: string
+
+    BeerRequest:
+      type: object
+      required: [name, style, abv]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        style:
+          type: string
+          minLength: 1
+          maxLength: 50
+        abv:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+        description:
+          type: string
+          maxLength: 500
+
+    BeerPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Beer'
+        offset:
+          type: integer
+        limit:
+          type: integer
+        hasMore:
+          type: boolean
+
+    ManufacturerPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Manufacturer'
+        offset:
+          type: integer
+        limit:
+          type: integer
+        hasMore:
+          type: boolean
+
+    Problem:
+      type: object
+      description: application/problem+json conform error response
+      properties:
+        title:
+          type: string
+          description: Short, stable summary of the problem type
+          example: Beer not found
+        status:
+          type: integer
+          description: HTTP status code
+          example: 404
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence
+          example: No beer with id 'a3b8c2d1-...' exists in the catalogue
+        instance:
+          type: string
+          format: uri
+          description: URI identifying this specific problem occurrence
+          example: /api/beers/a3b8c2d1-
