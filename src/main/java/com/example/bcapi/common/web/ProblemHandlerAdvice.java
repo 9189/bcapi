@@ -2,6 +2,7 @@ package com.example.bcapi.common.web;
 
 import com.example.bcapi.beer.domain.BeerNotFoundException;
 import com.example.bcapi.beer.domain.InvalidBeerTypeException;
+import jakarta.validation.ConstraintViolationException;
 import com.example.bcapi.manufacturer.domain.InvalidCountryCodeException;
 import com.example.bcapi.manufacturer.domain.ManufacturerNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -15,29 +16,46 @@ class ProblemHandlerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidCountryCodeException.class)
     ProblemDetail handleInvalidCountryCode(InvalidCountryCodeException ex) {
-        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
         problem.setTitle("Invalid Country Code");
         return problem;
     }
 
     @ExceptionHandler(ManufacturerNotFoundException.class)
     ProblemDetail handleManufacturerNotFound(ManufacturerNotFoundException ex) {
-        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problem.setTitle("Manufacturer Not Found");
         return problem;
     }
 
     @ExceptionHandler(BeerNotFoundException.class)
     ProblemDetail handleBeerNotFound(BeerNotFoundException ex) {
-        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problem.setTitle("Beer Not Found");
         return problem;
     }
 
     @ExceptionHandler(InvalidBeerTypeException.class)
     ProblemDetail handleInvalidBeerType(InvalidBeerTypeException ex) {
-        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
         problem.setTitle("Invalid Beer Type");
+        return problem;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
+        String detail = ex.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(java.util.stream.Collectors.joining(", "));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
+        problem.setTitle("Invalid Parameter");
+        return problem;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Invalid Parameter");
         return problem;
     }
 }
