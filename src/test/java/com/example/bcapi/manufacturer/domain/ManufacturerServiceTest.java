@@ -51,19 +51,24 @@ class ManufacturerServiceTest {
 
     @Test
     void update_validManufacturer_returnsUpdated() {
-        var manufacturer = new Manufacturer(UUID.randomUUID(), "Heineken", "NL", now(), now());
-        when(manufacturerRepository.update(any())).thenReturn(manufacturer);
+        var id = UUID.randomUUID();
+        var update = new ManufacturerDraft("Estrella Galicia", "ES");
+        var existing = new Manufacturer(id, "Heineken", "NL", now(), now());
+        var expected = new Manufacturer(existing.id(), update.name(), update.originCountry(), existing.createdAt(), now());
+        when(manufacturerRepository.findById(id)).thenReturn(Optional.of(existing));
+        when(manufacturerRepository.update(any())).thenReturn(expected);
 
-        var result = manufacturerService.update(manufacturer);
+        var result = manufacturerService.update(id, update);
 
-        assertThat(result).isEqualTo(manufacturer);
+        assertThat(result).isEqualTo(expected);
     }
 
     @Test
     void update_invalidCountryCode_throwsValidationException() {
-        var manufacturer = new Manufacturer(UUID.randomUUID(), "Heineken", "INVALID", now(), now());
+        var id = UUID.randomUUID();
+        var manufacturer = new ManufacturerDraft( "Heineken", "INVALID");
 
-        assertThatThrownBy(() -> manufacturerService.update(manufacturer))
+        assertThatThrownBy(() -> manufacturerService.update(id, manufacturer))
                 .isInstanceOf(InvalidCountryCodeException.class);
     }
 
