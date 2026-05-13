@@ -6,12 +6,16 @@ import org.springframework.stereotype.Service;
 public class ManufacturerService {
 
     private final ManufacturerRepository manufacturerRepository;
+    private final CountryCodeValidator countryCodeValidator;
 
-    public ManufacturerService(ManufacturerRepository manufacturerRepository) {
+    public ManufacturerService(ManufacturerRepository manufacturerRepository, CountryCodeValidator countryCodeValidator) {
         this.manufacturerRepository = manufacturerRepository;
+        this.countryCodeValidator = countryCodeValidator;
     }
 
-    public Manufacturer create(ManufacturerDraft manufacturer) {
-        return manufacturerRepository.create(manufacturer);
+    public Manufacturer create(ManufacturerDraft draft) {
+        countryCodeValidator.validate(draft.originCountry());
+
+        return manufacturerRepository.create(draft);
     }
 }

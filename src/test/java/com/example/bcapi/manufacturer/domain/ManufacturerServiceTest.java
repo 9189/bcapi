@@ -14,7 +14,8 @@ import static org.mockito.Mockito.when;
 class ManufacturerServiceTest {
 
     private final ManufacturerRepository manufacturerRepository = mock(ManufacturerRepository.class);
-    private final ManufacturerService manufacturerService = new ManufacturerService(manufacturerRepository);
+    private final CountryCodeValidator countryCodeValidator = new CountryCodeValidator();
+    private final ManufacturerService manufacturerService = new ManufacturerService(manufacturerRepository, countryCodeValidator);
 
     @Test
     void create_validDraft_returnsPersistedManufacturer() {
@@ -35,5 +36,13 @@ class ManufacturerServiceTest {
         assertThatThrownBy(() -> manufacturerService.create(draft))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("persistence failure");
+    }
+
+    @Test
+    void create_invalidCountryCode_throwsValidationException() {
+        var draft = new ManufacturerDraft("Heineken", "INVALID");
+
+        assertThatThrownBy(() -> manufacturerService.create(draft))
+                .isInstanceOf(InvalidCountryCodeException.class);
     }
 }
