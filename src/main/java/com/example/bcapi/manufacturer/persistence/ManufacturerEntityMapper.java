@@ -6,9 +6,9 @@ import com.example.bcapi.manufacturer.domain.ManufacturerDraft;
 import org.springframework.stereotype.Component;
 
 @Component
-class ManufacturerEntityMapper {
+public class ManufacturerEntityMapper {
 
-    Manufacturer toDomain(ManufacturerEntity entity) {
+    public Manufacturer toDomain(ManufacturerEntity entity) {
         return new Manufacturer(
                 entity.getId(),
                 entity.getName(),
@@ -18,7 +18,7 @@ class ManufacturerEntityMapper {
         );
     }
 
-    Page<Manufacturer> toDomain(org.springframework.data.domain.Page<ManufacturerEntity> page) {
+    public Page<Manufacturer> toDomain(org.springframework.data.domain.Page<ManufacturerEntity> page) {
         return new Page<>(
                 page.map(this::toDomain).toList(),
                 page.getNumber(),
@@ -27,7 +27,7 @@ class ManufacturerEntityMapper {
         );
     }
 
-    ManufacturerEntity toEntity(Manufacturer manufacturer) {
+    public ManufacturerEntity toEntity(Manufacturer manufacturer) {
         return new ManufacturerEntity(
                 manufacturer.id(),
                 manufacturer.name(),
@@ -37,7 +37,7 @@ class ManufacturerEntityMapper {
         );
     }
 
-    ManufacturerEntity toEntity(ManufacturerDraft draft) {
+    public ManufacturerEntity toEntity(ManufacturerDraft draft) {
         return new ManufacturerEntity(
                 draft.name(),
                 draft.originCountry()

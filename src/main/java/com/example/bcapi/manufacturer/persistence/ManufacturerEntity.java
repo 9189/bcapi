@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "manufacturers")
-class ManufacturerEntity {
+public class ManufacturerEntity {
 
     @Id
     @UuidGenerator
@@ -34,12 +34,16 @@ class ManufacturerEntity {
 
     protected ManufacturerEntity() {}
 
-    ManufacturerEntity(String name, String originCountry) {
+    public ManufacturerEntity(UUID id) {
+        this.id = id;
+    }
+
+    public ManufacturerEntity(String name, String originCountry) {
         this.name = name;
         this.originCountry = originCountry;
     }
 
-    ManufacturerEntity(UUID id, String name, String originCountry, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public ManufacturerEntity(UUID id, String name, String originCountry, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.originCountry = originCountry;
@@ -47,9 +51,9 @@ class ManufacturerEntity {
         this.updatedAt = updatedAt;
     }
 
-    UUID getId() { return id; }
-    String getName() { return name; }
-    String getOriginCountry() { return originCountry; }
-    OffsetDateTime getCreatedAt() { return createdAt; }
-    OffsetDateTime getUpdatedAt() { return updatedAt; }
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public String getOriginCountry() { return originCountry; }
+    public OffsetDateTime getCreatedAt() { return createdAt; }
+    public OffsetDateTime getUpdatedAt() { return updatedAt; }
 }
