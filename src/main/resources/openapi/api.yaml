@@ -267,7 +267,7 @@ components:
   schemas:
     Beer:
       type: object
-      required: [id, name, style, abv, manufacturer]
+      required: [id, name, type, abv, manufacturer]
       properties:
         id:
           type: string
@@ -279,10 +279,39 @@ components:
         type:
           type: string
           x-extensible-enum:
+            - LAGER
+            - PILSNER
+            - HELLES
+            - MAERZEN
+            - DUNKEL
+            - BOCK
+            - DOPPELBOCK
+            - PALE_ALE
             - IPA
-            - Lager
-            - Stout
-          example: Lager
+            - DOUBLE_IPA
+            - SESSION_IPA
+            - AMBER_ALE
+            - BROWN_ALE
+            - PORTER
+            - STOUT
+            - IMPERIAL_STOUT
+            - BARLEYWINE
+            - HEFEWEIZEN
+            - WITBIER
+            - WHEAT
+            - BERLINER_WEISSE
+            - SAISON
+            - FARMHOUSE_ALE
+            - DUBBEL
+            - TRIPEL
+            - QUADRUPEL
+            - SOUR
+            - GOSE
+            - LAMBIC
+            - CREAM_ALE
+            - KOLSCH
+            - ALTBIER
+          example: LAGER
         abv:
           type: number
           format: double
@@ -325,13 +354,13 @@ components:
 
     BeerCreateRequest:
       type: object
-      required: [name, style, abv, manufacturerId]
+      required: [name, type, abv, manufacturerId]
       properties:
         name:
           type: string
           minLength: 1
           maxLength: 100
-        style:
+        type:
           type: string
           minLength: 1
           maxLength: 50
@@ -349,13 +378,13 @@ components:
 
     BeerUpdateRequest:
       type: object
-      required: [name, style, abv, description, manufacturerId]
+      required: [name, type, abv, description, manufacturerId]
       properties:
         name:
           type: string
           minLength: 1
           maxLength: 100
-        style:
+        type:
           type: string
           minLength: 1
           maxLength: 50

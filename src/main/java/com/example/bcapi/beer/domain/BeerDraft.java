@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record BeerDraft(
         String name,
-        String type,
+        BeerType type,
         double abv,
         String description,
         UUID manufacturerId

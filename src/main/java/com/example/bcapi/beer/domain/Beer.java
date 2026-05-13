@@ -8,7 +8,7 @@ import java.util.UUID;
 public record Beer(
         UUID id,
         String name,
-        String type,
+        BeerType type,
         double abv,
         String description,
         Manufacturer manufacturer,

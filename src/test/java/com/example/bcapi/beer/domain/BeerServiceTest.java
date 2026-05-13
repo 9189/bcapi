@@ -1,5 +1,6 @@
 package com.example.bcapi.beer.domain;
 
+import com.example.bcapi.beer.domain.BeerType;
 import com.example.bcapi.common.domain.Page;
 import com.example.bcapi.manufacturer.domain.Manufacturer;
 import com.example.bcapi.manufacturer.domain.ManufacturerNotFoundException;
@@ -28,8 +29,8 @@ class BeerServiceTest {
 
     @Test
     void create_validDraft_returnsPersistedBeer() {
-        var draft = new BeerDraft("Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer.id());
-        var expected = new Beer(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer, now(), now());
+        var draft = new BeerDraft("Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer.id());
+        var expected = new Beer(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer, now(), now());
         when(manufacturerService.findById(manufacturer.id())).thenReturn(manufacturer);
         when(beerRepository.create(any())).thenReturn(expected);
 
@@ -40,7 +41,7 @@ class BeerServiceTest {
 
     @Test
     void create_unknownManufacturer_throwsNotFoundException() {
-        var draft = new BeerDraft("Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer.id());
+        var draft = new BeerDraft("Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer.id());
         when(manufacturerService.findById(manufacturer.id())).thenThrow(new ManufacturerNotFoundException(manufacturer.id()));
 
         assertThatThrownBy(() -> beerService.create(draft))
@@ -49,7 +50,7 @@ class BeerServiceTest {
 
     @Test
     void create_repositoryFails_throwsException() {
-        var draft = new BeerDraft("Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer.id());
+        var draft = new BeerDraft("Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer.id());
         when(manufacturerService.findById(manufacturer.id())).thenReturn(manufacturer);
         when(beerRepository.create(any())).thenThrow(new RuntimeException("persistence failure"));
 
@@ -61,8 +62,8 @@ class BeerServiceTest {
     @Test
     void update_existingBeer_returnsUpdated() {
         var id = UUID.randomUUID();
-        var draft = new BeerDraft("Zipfer Urquell Premium", "Lager", 5.2, "An upgraded lager", manufacturer.id());
-        var existing = new Beer(id, "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer, now(), now());
+        var draft = new BeerDraft("Zipfer Urquell Premium", BeerType.LAGER, 5.2, "An upgraded lager", manufacturer.id());
+        var existing = new Beer(id, "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer, now(), now());
         var expected = new Beer(id, draft.name(), draft.type(), draft.abv(), draft.description(), manufacturer, existing.createdAt(), now());
         when(beerRepository.findById(id)).thenReturn(Optional.of(existing));
         when(manufacturerService.findById(manufacturer.id())).thenReturn(manufacturer);
@@ -77,8 +78,8 @@ class BeerServiceTest {
     void update_withNewManufacturer_resolvesManufacturer() {
         var id = UUID.randomUUID();
         var newManufacturer = new Manufacturer(UUID.randomUUID(), "Estrella Galicia", "ES", now(), now());
-        var draft = new BeerDraft("Zipfer Urquell", "Lager", 5.0, "A classic lager", newManufacturer.id());
-        var existing = new Beer(id, "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer, now(), now());
+        var draft = new BeerDraft("Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", newManufacturer.id());
+        var existing = new Beer(id, "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer, now(), now());
         var expected = new Beer(id, draft.name(), draft.type(), draft.abv(), draft.description(), newManufacturer, existing.createdAt(), now());
         when(beerRepository.findById(id)).thenReturn(Optional.of(existing));
         when(manufacturerService.findById(newManufacturer.id())).thenReturn(newManufacturer);
@@ -92,7 +93,7 @@ class BeerServiceTest {
     @Test
     void update_unknownId_throwsNotFoundException() {
         var id = UUID.randomUUID();
-        var draft = new BeerDraft("Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer.id());
+        var draft = new BeerDraft("Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer.id());
         when(beerRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> beerService.update(id, draft))
@@ -101,7 +102,7 @@ class BeerServiceTest {
 
     @Test
     void findById_existingId_returnsBeer() {
-        var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer, now(), now());
+        var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer, now(), now());
         when(beerRepository.findById(beer.id())).thenReturn(Optional.of(beer));
 
         var result = beerService.findById(beer.id());
@@ -121,7 +122,7 @@ class BeerServiceTest {
     @Test
     void findAll_returnsPage() {
         var query = new BeerQuery(0, 20);
-        var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturer, now(), now());
+        var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer, now(), now());
         var page = new Page<>(List.of(beer), 0, 20, false);
         when(beerRepository.findAll(query)).thenReturn(page);
 

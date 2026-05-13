@@ -1,0 +1,37 @@
+package com.example.bcapi.beer.domain;
+
+// Based on BJCP (Beer Judge Certification Program) style guidelines: https://www.bjcp.org/
+public enum BeerType {
+    LAGER,
+    PILSNER,
+    HELLES,
+    MAERZEN,
+    DUNKEL,
+    BOCK,
+    DOPPELBOCK,
+    PALE_ALE,
+    IPA,
+    DOUBLE_IPA,
+    SESSION_IPA,
+    AMBER_ALE,
+    BROWN_ALE,
+    PORTER,
+    STOUT,
+    IMPERIAL_STOUT,
+    BARLEYWINE,
+    HEFEWEIZEN,
+    WITBIER,
+    WHEAT,
+    BERLINER_WEISSE,
+    SAISON,
+    FARMHOUSE_ALE,
+    DUBBEL,
+    TRIPEL,
+    QUADRUPEL,
+    SOUR,
+    GOSE,
+    LAMBIC,
+    CREAM_ALE,
+    KOLSCH,
+    ALTBIER
+}

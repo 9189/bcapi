@@ -1,11 +1,14 @@
 package com.example.bcapi.beer.persistence;
 
 import com.example.bcapi.beer.domain.Beer;
+import com.example.bcapi.beer.domain.BeerType;
 import com.example.bcapi.beer.domain.BeerDraft;
 import com.example.bcapi.manufacturer.domain.Manufacturer;
 import com.example.bcapi.manufacturer.persistence.ManufacturerEntity;
 import com.example.bcapi.manufacturer.persistence.ManufacturerEntityMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
@@ -27,14 +30,14 @@ class BeerEntityMapperTest {
 
     @Test
     void toDomain_allFieldsMapped() {
-        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
+        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER.name(), 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
 
         var result = mapper.toDomain(entity);
 
         assertSoftly(softly -> {
             softly.assertThat(result.id()).isEqualTo(entity.getId());
             softly.assertThat(result.name()).isEqualTo(entity.getName());
-            softly.assertThat(result.type()).isEqualTo(entity.getType());
+            softly.assertThat(result.type()).isEqualTo(BeerType.valueOf(entity.getType()));
             softly.assertThat(result.abv()).isEqualTo(entity.getAbv());
             softly.assertThat(result.description()).isEqualTo(entity.getDescription());
             softly.assertThat(result.manufacturer().id()).isEqualTo(manufacturerId);
@@ -45,7 +48,7 @@ class BeerEntityMapperTest {
 
     @Test
     void toEntity_allFieldsMapped() {
-        var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager",
+        var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager",
                 new Manufacturer(manufacturerId, "Heineken", "NL", OffsetDateTime.now(), OffsetDateTime.now()),
                 OffsetDateTime.now(), OffsetDateTime.now());
 
@@ -54,7 +57,7 @@ class BeerEntityMapperTest {
         assertSoftly(softly -> {
             softly.assertThat(result.getId()).isEqualTo(beer.id());
             softly.assertThat(result.getName()).isEqualTo(beer.name());
-            softly.assertThat(result.getType()).isEqualTo(beer.type());
+            softly.assertThat(result.getType()).isEqualTo(beer.type().name());
             softly.assertThat(result.getAbv()).isEqualTo(beer.abv());
             softly.assertThat(result.getDescription()).isEqualTo(beer.description());
             softly.assertThat(result.getManufacturer().getId()).isEqualTo(manufacturerId);
@@ -65,13 +68,13 @@ class BeerEntityMapperTest {
 
     @Test
     void draftToEntity_allFieldsMapped() {
-        var draft = new BeerDraft("Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturerId);
+        var draft = new BeerDraft("Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturerId);
 
         var result = mapper.toEntity(draft, manufacturerEntity);
 
         assertSoftly(softly -> {
             softly.assertThat(result.getName()).isEqualTo(draft.name());
-            softly.assertThat(result.getType()).isEqualTo(draft.type());
+            softly.assertThat(result.getType()).isEqualTo(draft.type().name());
             softly.assertThat(result.getAbv()).isEqualTo(draft.abv());
             softly.assertThat(result.getDescription()).isEqualTo(draft.description());
             softly.assertThat(result.getManufacturer().getId()).isEqualTo(manufacturerId);
@@ -81,9 +84,19 @@ class BeerEntityMapperTest {
         });
     }
 
+    @ParameterizedTest
+    @EnumSource(BeerType.class)
+    void toDomain_allBeerTypesMapped(BeerType beerType) {
+        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", beerType.name(), 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
+
+        var result = mapper.toDomain(entity);
+
+        assertThat(result.type()).isEqualTo(beerType);
+    }
+
     @Test
     void toDomain_toEntity_roundtrip() {
-        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
+        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER.name(), 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
 
         var domain = mapper.toDomain(entity);
         var result = mapper.toEntity(domain, manufacturerEntity);
@@ -102,7 +115,7 @@ class BeerEntityMapperTest {
 
     @Test
     void toPage_mapsItemsPageSizeAndHasMore() {
-        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
+        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER.name(), 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
         var springPage = new PageImpl<>(List.of(entity), PageRequest.of(0, 1), 2);
 
         var result = mapper.toDomain(springPage);
@@ -118,7 +131,7 @@ class BeerEntityMapperTest {
 
     @Test
     void toPage_lastPage_hasMoreIsFalse() {
-        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", "Lager", 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
+        var entity = new BeerEntity(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER.name(), 5.0, "A classic lager", manufacturerEntity, OffsetDateTime.now(), OffsetDateTime.now());
         var springPage = new PageImpl<>(List.of(entity), PageRequest.of(0, 20), 1);
 
         var result = mapper.toDomain(springPage);
