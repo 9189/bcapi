@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-add-indexes
+      author: Joe Martin
+      changes:
+        - createIndex:
+            indexName: idx_beers_manufacturer_id
+            tableName: beers
+            columns:
+              - column:
+                  name: manufacturer_id
+            remarks: Supports FK joins and manufacturer existence checks before delete
+
+        - createIndex:
+            indexName: idx_beers_name
+            tableName: beers
+            columns:
+              - column:
+                  name: name
+            remarks: Supports sorting by name
+
+        - createIndex:
+            indexName: idx_beers_type
+            tableName: beers
+            columns:
+              - column:
+                  name: type
+            remarks: Supports sorting by type
+
+        - createIndex:
+            indexName: idx_beers_abv
+            tableName: beers
+            columns:
+              - column:
+                  name: abv
+            remarks: Supports sorting by abv
+
+        - createIndex:
+            indexName: idx_manufacturers_name
+            tableName: manufacturers
+            columns:
+              - column:
+                  name: name
+            remarks: Supports sorting by name
