@@ -47,4 +47,53 @@ class ManufacturerIT {
             softly.assertThat(row.get("origin_country")).isEqualTo("ES");
         });
     }
+
+    @Test
+    void post_invalidCountryCode_returnsUnprocessableEntityWithProblemDetail() {
+        var result = restTestClient.post().uri("/api/manufacturers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Fake Brewery",
+                          "originCountry": "XX"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectHeader().contentType("application/problem+json")
+                .expectBody(Map.class)
+                .returnResult();
+
+        assertSoftly(softly -> {
+            var body = Objects.requireNonNull(result.getResponseBody());
+            softly.assertThat(body.get("status")).isEqualTo(422);
+            softly.assertThat(body.get("title")).isNotNull();
+            softly.assertThat(body.get("detail")).isNotNull();
+            softly.assertThat(db.count()).isZero();
+        });
+    }
+
+    @Test
+    void post_missingRequiredField_returnsBadRequestWithProblemDetail() {
+        var result = restTestClient.post().uri("/api/manufacturers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "originCountry": "ES"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType("application/problem+json")
+                .expectBody(Map.class)
+                .returnResult();
+
+        assertSoftly(softly -> {
+            var body = Objects.requireNonNull(result.getResponseBody());
+            softly.assertThat(body.get("status")).isEqualTo(400);
+            softly.assertThat(body.get("title")).isNotNull();
+            softly.assertThat(body.get("detail")).isNotNull();
+            softly.assertThat(db.count()).isZero();
+        });
+    }
 }

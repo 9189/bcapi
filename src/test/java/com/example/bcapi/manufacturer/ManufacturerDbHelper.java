@@ -18,4 +18,8 @@ class ManufacturerDbHelper {
     Map<String, Object> findById(UUID id) {
         return jdbcTemplate.queryForMap("SELECT * FROM manufacturers WHERE id = ?", id);
     }
+
+    int count() {
+        return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM manufacturers", Integer.class);
+    }
 }

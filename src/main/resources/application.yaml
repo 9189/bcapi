@@ -1,6 +1,9 @@
 spring:
   application:
     name: bcapi
+  mvc:
+    problemdetails:
+      enabled: true
 
 springdoc:
   api-docs:
