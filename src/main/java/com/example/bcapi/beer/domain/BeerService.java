@@ -1,7 +1,6 @@
 package com.example.bcapi.beer.domain;
 
 import com.example.bcapi.common.domain.Page;
-import com.example.bcapi.manufacturer.domain.Manufacturer;
 import com.example.bcapi.manufacturer.domain.ManufacturerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
