@@ -1,36 +1,50 @@
 package com.example.bcapi.manufacturer;
 
-import com.example.bcapi.TestcontainersConfiguration;
+import com.example.bcapi.common.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureRestTestClient
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
+@IntegrationTest
 class ManufacturerIT {
 
     @Autowired
     RestTestClient restTestClient;
 
+    @Autowired
+    ManufacturerDbHelper db;
+
     @Test
-    void post_returnsCreated() {
-        restTestClient.post().uri("/api/manufacturers")
+    void post_validRequest_returnsCreatedWithLocationAndPersists() {
+        var result = restTestClient.post().uri("/api/manufacturers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
-                          "name": "string",
-                          "originCountry": "string"
+                          "name": "Estrella Galicia",
+                          "originCountry": "ES"
                         }
                         """)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody()
-                .jsonPath("$.id").exists()
-                .jsonPath("$.name").isEqualTo("Zipfer Urquell");
+                .expectBody(Map.class)
+                .returnResult();
+
+        var location = result.getResponseHeaders().getLocation();
+        var id = UUID.fromString((String) Objects.requireNonNull(result.getResponseBody()).get("id"));
+        var row = db.findById(id);
+
+        assertSoftly(softly -> {
+            softly.assertThat(location).isNotNull();
+            softly.assertThat(location.getPath()).startsWith("/api/manufacturers/");
+            softly.assertThat(row.get("name")).isEqualTo("Estrella Galicia");
+            softly.assertThat(row.get("origin_country")).isEqualTo("ES");
+        });
     }
 }
