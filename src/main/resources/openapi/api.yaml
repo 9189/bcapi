@@ -81,6 +81,12 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '422':
+          description: Invalid beer type
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
 
   /api/beers/{id}:
     parameters:
@@ -134,6 +140,12 @@ paths:
                 $ref: '#/components/schemas/Problem'
         '404':
           description: Beer not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Invalid beer type
           content:
             application/problem+json:
               schema:
@@ -205,6 +217,12 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '422':
+          description: Invalid country code
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
 
   /api/manufacturers/{id}:
     parameters:
@@ -258,6 +276,12 @@ paths:
                 $ref: '#/components/schemas/Problem'
         '404':
           description: Manufacturer not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Invalid country code
           content:
             application/problem+json:
               schema:
