@@ -117,6 +117,85 @@ class BeerIT {
     }
 
     @Test
+    void getAll_searchByName_returnsMatchingBeers() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+        var zipfer1Id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+        var zipfer2Id = db.insert("Zipfer Dark", "DUNKEL", 5.2, "A dark lager", manufacturerId);
+        db.insert("Amstel", "LAGER", 5.0, "A Dutch lager", manufacturerId);
+
+        var result = restTestClient.get().uri("/api/beers?search=ZIPFER")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Map.class)
+                .returnResult();
+
+        var items = (List<Map<String, Object>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        var ids = items.stream().map(item -> (String) item.get("id")).toList();
+        assertSoftly(softly -> {
+            softly.assertThat(items).hasSize(2);
+            softly.assertThat(ids).containsExactlyInAnyOrder(zipfer1Id.toString(), zipfer2Id.toString());
+        });
+    }
+
+    @Test
+    void getAll_searchByType_returnsMatchingBeers() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+        db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+        var ipaId = db.insert("Punk IPA", "IPA", 5.6, "A hoppy IPA", manufacturerId);
+
+        var result = restTestClient.get().uri("/api/beers?search=ipa")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Map.class)
+                .returnResult();
+
+        var items = (List<Map<String, Object>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        assertSoftly(softly -> {
+            softly.assertThat(items).hasSize(1);
+            softly.assertThat(items.getFirst().get("id")).isEqualTo(ipaId.toString());
+        });
+    }
+
+    @Test
+    void getAll_searchByManufacturerName_returnsMatchingBeers() {
+        var heinekenId = manufacturerDb.insert("Heineken", "NL");
+        var estrellaId = manufacturerDb.insert("Estrella Galicia", "ES");
+        db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", heinekenId);
+        var mahouId = db.insert("Mahou Classic", "LAGER", 5.0, "A Spanish lager", estrellaId);
+
+        var result = restTestClient.get().uri("/api/beers?search=galicia")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Map.class)
+                .returnResult();
+
+        var items = (List<Map<String, Object>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        assertSoftly(softly -> {
+            softly.assertThat(items).hasSize(1);
+            softly.assertThat(items.getFirst().get("id")).isEqualTo(mahouId.toString());
+        });
+    }
+
+    @Test
+    void getAll_searchByAbv_returnsMatchingBeers() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+        var zipferId = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+        db.insert("Amstel", "LAGER", 5.0, "A Dutch lager", manufacturerId);
+
+        var result = restTestClient.get().uri("/api/beers?search=4.8")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Map.class)
+                .returnResult();
+
+        var items = (List<Map<String, Object>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        assertSoftly(softly -> {
+            softly.assertThat(items).hasSize(1);
+            softly.assertThat(items.getFirst().get("id")).isEqualTo(zipferId.toString());
+        });
+    }
+
+    @Test
     void getAll_invalidPageSize_returnsBadRequestWithProblemDetail() {
         var result = restTestClient.get().uri("/api/beers?size=0")
                 .exchange()
@@ -146,7 +225,7 @@ class BeerIT {
                 .expectBody(Map.class)
                 .returnResult();
 
-        var items = (List<Map<?, ?>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        var items = (List<Map<String, Object>>) Objects.requireNonNull(result.getResponseBody()).get("items");
         assertSoftly(softly -> {
             softly.assertThat(items).hasSize(3);
             softly.assertThat(items.get(0).get("name")).isEqualTo("Amstel");
@@ -168,7 +247,7 @@ class BeerIT {
                 .expectBody(Map.class)
                 .returnResult();
 
-        var items = (List<Map<?, ?>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        var items = (List<Map<String, Object>>) Objects.requireNonNull(result.getResponseBody()).get("items");
         assertSoftly(softly -> {
             softly.assertThat(items).hasSize(3);
             softly.assertThat(items.get(0).get("name")).isEqualTo("Amstel");

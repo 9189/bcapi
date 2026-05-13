@@ -54,13 +54,19 @@ public class BeerController implements BeersApi {
     }
 
     @Override
-    public ResponseEntity<BeerPageDto> getBeers(Integer page, Integer size, String sortBy, String sortDirection) {
+    public ResponseEntity<BeerPageDto> getBeers(
+            Integer page,
+            Integer size,
+            String sortBy,
+            String sortDirection,
+            String search
+    ) {
         var direction = switch (sortDirection.toLowerCase()) {
             case "asc" -> SortDirection.ASC;
             case "desc" -> SortDirection.DESC;
             default -> throw new IllegalArgumentException("Invalid sort direction: " + sortDirection);
         };
-        var result = beerService.findAll(new BeerQuery(page, size, sortBy, direction));
+        var result = beerService.findAll(new BeerQuery(page, size, sortBy, direction, search));
 
         return ResponseEntity.ok(mapper.toDto(result));
     }

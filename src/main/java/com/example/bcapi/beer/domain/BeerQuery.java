@@ -4,6 +4,7 @@ public record BeerQuery(
         int page,
         int size,
         String sortBy,
-        SortDirection sortDirection
+        SortDirection sortDirection,
+        String search
 ) {
 }

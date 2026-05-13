@@ -50,6 +50,12 @@ paths:
             type: string
             enum: [asc, desc]
             default: asc
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            description: Case-insensitive search across name, type, and manufacturer name
       responses:
         '200':
           description: A paginated list of beers

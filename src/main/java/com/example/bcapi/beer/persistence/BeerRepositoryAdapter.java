@@ -59,7 +59,7 @@ public class BeerRepositoryAdapter implements BeerRepository {
         };
         var pageRequest = PageRequest.of(query.page(), query.size(), Sort.by(direction, query.sortBy()));
         try {
-            return mapper.toDomain(jpaRepository.findAll(pageRequest));
+            return mapper.toDomain(jpaRepository.findAll(new BeerSearchSpecification(query.search()), pageRequest));
         } catch (PropertyReferenceException e) {
             throw new IllegalArgumentException("Invalid sort field: " + query.sortBy());
         }

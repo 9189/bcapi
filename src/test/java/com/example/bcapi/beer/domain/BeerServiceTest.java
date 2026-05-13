@@ -120,7 +120,7 @@ class BeerServiceTest {
 
     @Test
     void findAll_returnsPage() {
-        var query = new BeerQuery(0, 20, "name", SortDirection.ASC);
+        var query = new BeerQuery(0, 20, "name", SortDirection.ASC, "Zipfer");
         var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer, now(), now());
         var page = new Page<>(List.of(beer), 0, 20, false);
         when(beerRepository.findAll(query)).thenReturn(page);

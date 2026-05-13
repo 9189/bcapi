@@ -31,7 +31,7 @@ public class BeerEntity {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "manufacturer_id", nullable = false)
     private ManufacturerEntity manufacturer;
 
