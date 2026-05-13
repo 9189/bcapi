@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ManufacturerDtoMapper {
 
-    ManufacturerDto toDto(Manufacturer manufacturer) {
+    public ManufacturerDto toDto(Manufacturer manufacturer) {
         return new ManufacturerDto(
                 manufacturer.id(),
                 manufacturer.name(),
@@ -22,7 +22,7 @@ public class ManufacturerDtoMapper {
                 .updatedAt(manufacturer.updatedAt());
     }
 
-    ManufacturerPageDto toDto(Page<Manufacturer> page) {
+    public ManufacturerPageDto toDto(Page<Manufacturer> page) {
         return new ManufacturerPageDto()
                 .items(page.items().stream().map(this::toDto).toList())
                 .page(page.page())
@@ -30,14 +30,14 @@ public class ManufacturerDtoMapper {
                 .hasMore(page.hasMore());
     }
 
-    ManufacturerDraft toDomain(ManufacturerCreateRequestDto dto) {
+    public ManufacturerDraft toDomain(ManufacturerCreateRequestDto dto) {
         return new ManufacturerDraft(
                 dto.getName(),
                 dto.getOriginCountry()
         );
     }
 
-    ManufacturerDraft toDomain(ManufacturerUpdateRequestDto dto) {
+    public ManufacturerDraft toDomain(ManufacturerUpdateRequestDto dto) {
         return new ManufacturerDraft(
                 dto.getName(),
                 dto.getOriginCountry()

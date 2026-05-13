@@ -1,5 +1,7 @@
 package com.example.bcapi.common.web;
 
+import com.example.bcapi.beer.domain.BeerNotFoundException;
+import com.example.bcapi.beer.domain.InvalidBeerTypeException;
 import com.example.bcapi.manufacturer.domain.InvalidCountryCodeException;
 import com.example.bcapi.manufacturer.domain.ManufacturerNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,20 @@ class ProblemHandlerAdvice extends ResponseEntityExceptionHandler {
     ProblemDetail handleManufacturerNotFound(ManufacturerNotFoundException ex) {
         var problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problem.setTitle("Manufacturer Not Found");
+        return problem;
+    }
+
+    @ExceptionHandler(BeerNotFoundException.class)
+    ProblemDetail handleBeerNotFound(BeerNotFoundException ex) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Beer Not Found");
+        return problem;
+    }
+
+    @ExceptionHandler(InvalidBeerTypeException.class)
+    ProblemDetail handleInvalidBeerType(InvalidBeerTypeException ex) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+        problem.setTitle("Invalid Beer Type");
         return problem;
     }
 }

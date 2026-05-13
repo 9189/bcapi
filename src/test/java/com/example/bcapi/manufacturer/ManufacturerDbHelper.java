@@ -9,23 +9,23 @@ import java.util.UUID;
 import static java.time.OffsetDateTime.now;
 
 @Component
-class ManufacturerDbHelper {
+public class ManufacturerDbHelper {
 
     private final JdbcTemplate jdbcTemplate;
 
-    ManufacturerDbHelper(JdbcTemplate jdbcTemplate) {
+    public ManufacturerDbHelper(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    Map<String, Object> findById(UUID id) {
+    public Map<String, Object> findById(UUID id) {
         return jdbcTemplate.queryForMap("SELECT * FROM manufacturers WHERE id = ?", id);
     }
 
-    int count() {
+    public int count() {
         return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM manufacturers", Integer.class);
     }
 
-    UUID insert(String name, String originCountry) {
+    public UUID insert(String name, String originCountry) {
         var id = UUID.randomUUID();
         jdbcTemplate.update(
                 "INSERT INTO manufacturers (id, name, origin_country, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
