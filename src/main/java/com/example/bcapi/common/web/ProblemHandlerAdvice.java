@@ -1,6 +1,7 @@
 package com.example.bcapi.common.web;
 
 import com.example.bcapi.manufacturer.domain.InvalidCountryCodeException;
+import com.example.bcapi.manufacturer.domain.ManufacturerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +15,13 @@ class ProblemHandlerAdvice extends ResponseEntityExceptionHandler {
     ProblemDetail handleInvalidCountryCode(InvalidCountryCodeException ex) {
         var problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
         problem.setTitle("Invalid Country Code");
+        return problem;
+    }
+
+    @ExceptionHandler(ManufacturerNotFoundException.class)
+    ProblemDetail handleManufacturerNotFound(ManufacturerNotFoundException ex) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Manufacturer Not Found");
         return problem;
     }
 }

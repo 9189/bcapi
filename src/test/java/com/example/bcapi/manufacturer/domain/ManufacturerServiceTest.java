@@ -1,7 +1,10 @@
 package com.example.bcapi.manufacturer.domain;
 
+import com.example.bcapi.common.domain.Page;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.OffsetDateTime.now;
@@ -9,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ManufacturerServiceTest {
@@ -42,7 +46,63 @@ class ManufacturerServiceTest {
     void create_invalidCountryCode_throwsValidationException() {
         var draft = new ManufacturerDraft("Heineken", "INVALID");
 
-        assertThatThrownBy(() -> manufacturerService.create(draft))
+        assertThatThrownBy(() -> manufacturerService.create(draft)).isInstanceOf(InvalidCountryCodeException.class);
+    }
+
+    @Test
+    void update_validManufacturer_returnsUpdated() {
+        var manufacturer = new Manufacturer(UUID.randomUUID(), "Heineken", "NL", now(), now());
+        when(manufacturerRepository.update(any())).thenReturn(manufacturer);
+
+        var result = manufacturerService.update(manufacturer);
+
+        assertThat(result).isEqualTo(manufacturer);
+    }
+
+    @Test
+    void update_invalidCountryCode_throwsValidationException() {
+        var manufacturer = new Manufacturer(UUID.randomUUID(), "Heineken", "INVALID", now(), now());
+
+        assertThatThrownBy(() -> manufacturerService.update(manufacturer))
                 .isInstanceOf(InvalidCountryCodeException.class);
+    }
+
+    @Test
+    void findById_existingId_returnsManufacturer() {
+        var manufacturer = new Manufacturer(UUID.randomUUID(), "Heineken", "NL", now(), now());
+        when(manufacturerRepository.findById(manufacturer.id())).thenReturn(Optional.of(manufacturer));
+
+        var result = manufacturerService.findById(manufacturer.id());
+
+        assertThat(result).isEqualTo(manufacturer);
+    }
+
+    @Test
+    void findById_unknownId_throwsNotFoundException() {
+        var id = UUID.randomUUID();
+        when(manufacturerRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> manufacturerService.findById(id)).isInstanceOf(ManufacturerNotFoundException.class);
+    }
+
+    @Test
+    void findAll_returnsPage() {
+        var query = new ManufacturerQuery(0, 20);
+        var manufacturer = new Manufacturer(UUID.randomUUID(), "Heineken", "NL", now(), now());
+        var page = new Page<>(List.of(manufacturer), 0, 20, false);
+        when(manufacturerRepository.findAll(query)).thenReturn(page);
+
+        var result = manufacturerService.findAll(query);
+
+        assertThat(result).isEqualTo(page);
+    }
+
+    @Test
+    void delete_delegatesToRepository() {
+        var id = UUID.randomUUID();
+
+        manufacturerService.delete(id);
+
+        verify(manufacturerRepository).delete(id);
     }
 }
