@@ -36,6 +36,20 @@ paths:
             default: 20
             minimum: 1
             maximum: 100
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [name, abv, type]
+            default: name
+        - name: sortDirection
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
       responses:
         '200':
           description: A paginated list of beers
