@@ -117,6 +117,126 @@ class BeerIT {
     }
 
     @Test
+    void getAll_invalidPageSize_returnsBadRequestWithProblemDetail() {
+        var result = restTestClient.get().uri("/api/beers?size=0")
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType("application/problem+json")
+                .expectBody(Map.class)
+                .returnResult();
+
+        var body = Objects.requireNonNull(result.getResponseBody());
+        assertSoftly(softly -> {
+            softly.assertThat(body.get("status")).isEqualTo(400);
+            softly.assertThat(body.get("title")).isNotNull();
+            softly.assertThat(body.get("detail")).isNotNull();
+        });
+    }
+
+    @Test
+    void getAll_sortedByNameAscending_returnsItemsInOrder() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+        db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+        db.insert("Amstel", "LAGER", 5.0, "A Dutch lager", manufacturerId);
+        db.insert("Moretti", "LAGER", 4.6, "An Italian lager", manufacturerId);
+
+        var result = restTestClient.get().uri("/api/beers?page=0&size=10&sortBy=name&sortDirection=asc")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Map.class)
+                .returnResult();
+
+        var items = (List<Map<?, ?>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        assertSoftly(softly -> {
+            softly.assertThat(items).hasSize(3);
+            softly.assertThat(items.get(0).get("name")).isEqualTo("Amstel");
+            softly.assertThat(items.get(1).get("name")).isEqualTo("Moretti");
+            softly.assertThat(items.get(2).get("name")).isEqualTo("Zipfer Urquell");
+        });
+    }
+
+    @Test
+    void getAll_sortedByAbvDescending_returnsItemsInOrder() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+        db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+        db.insert("Amstel", "LAGER", 5.0, "A Dutch lager", manufacturerId);
+        db.insert("Moretti", "LAGER", 4.6, "An Italian lager", manufacturerId);
+
+        var result = restTestClient.get().uri("/api/beers?page=0&size=10&sortBy=abv&sortDirection=desc")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Map.class)
+                .returnResult();
+
+        var items = (List<Map<?, ?>>) Objects.requireNonNull(result.getResponseBody()).get("items");
+        assertSoftly(softly -> {
+            softly.assertThat(items).hasSize(3);
+            softly.assertThat(items.get(0).get("name")).isEqualTo("Amstel");
+            softly.assertThat(items.get(1).get("name")).isEqualTo("Zipfer Urquell");
+            softly.assertThat(items.get(2).get("name")).isEqualTo("Moretti");
+        });
+    }
+
+    @Test
+    void getAll_invalidSortBy_returnsBadRequestWithProblemDetail() {
+        var result = restTestClient.get().uri("/api/beers?sortBy=invalid")
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType("application/problem+json")
+                .expectBody(Map.class)
+                .returnResult();
+
+        var body = Objects.requireNonNull(result.getResponseBody());
+        assertSoftly(softly -> {
+            softly.assertThat(body.get("status")).isEqualTo(400);
+            softly.assertThat(body.get("title")).isNotNull();
+            softly.assertThat(body.get("detail")).isNotNull();
+        });
+    }
+
+    @Test
+    void getAll_invalidSortDirection_returnsBadRequestWithProblemDetail() {
+        var result = restTestClient.get().uri("/api/beers?sortDirection=invalid")
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType("application/problem+json")
+                .expectBody(Map.class)
+                .returnResult();
+
+        var body = Objects.requireNonNull(result.getResponseBody());
+        assertSoftly(softly -> {
+            softly.assertThat(body.get("status")).isEqualTo(400);
+            softly.assertThat(body.get("title")).isNotNull();
+            softly.assertThat(body.get("detail")).isNotNull();
+        });
+    }
+
+    @Test
+    void post_missingRequiredField_returnsBadRequestWithProblemDetail() {
+        var result = restTestClient.post().uri("/api/beers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "type": "LAGER",
+                          "abv": 4.8
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType("application/problem+json")
+                .expectBody(Map.class)
+                .returnResult();
+
+        var body = Objects.requireNonNull(result.getResponseBody());
+        assertSoftly(softly -> {
+            softly.assertThat(body.get("status")).isEqualTo(400);
+            softly.assertThat(body.get("title")).isNotNull();
+            softly.assertThat(body.get("detail")).isNotNull();
+            softly.assertThat(db.count()).isZero();
+        });
+    }
+
+    @Test
     void get_unknownId_returnsNotFoundWithProblemDetail() {
         var result = restTestClient.get().uri("/api/beers/{id}", UUID.randomUUID())
                 .exchange()
@@ -195,7 +315,7 @@ class BeerIT {
         db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
         db.insert("Heineken Pilsner", "PILSNER", 5.0, "A classic pilsner", manufacturerId);
 
-        var result = restTestClient.get().uri("/api/beers?page=0&size=10")
+        var result = restTestClient.get().uri("/api/beers?page=0&size=10&sortBy=name&sortDirection=asc")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Map.class)

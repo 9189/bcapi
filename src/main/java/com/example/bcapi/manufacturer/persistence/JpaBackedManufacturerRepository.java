@@ -3,5 +3,5 @@ package com.example.bcapi.manufacturer.persistence;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
-interface JpaBackedManufacturerRepository extends JpaRepository<ManufacturerEntity, UUID> {
+public interface JpaBackedManufacturerRepository extends JpaRepository<ManufacturerEntity, UUID> {
 }

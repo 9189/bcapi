@@ -3,6 +3,7 @@ package com.example.bcapi.beer.web;
 import com.example.bcapi.api.BeersApi;
 import com.example.bcapi.beer.domain.BeerQuery;
 import com.example.bcapi.beer.domain.BeerService;
+import com.example.bcapi.beer.domain.SortDirection;
 import com.example.bcapi.model.BeerCreateRequestDto;
 import com.example.bcapi.model.BeerDto;
 import com.example.bcapi.model.BeerPageDto;
@@ -53,8 +54,13 @@ public class BeerController implements BeersApi {
     }
 
     @Override
-    public ResponseEntity<BeerPageDto> getBeers(Integer page, Integer size) {
-        var result = beerService.findAll(new BeerQuery(page, size));
+    public ResponseEntity<BeerPageDto> getBeers(Integer page, Integer size, String sortBy, String sortDirection) {
+        var direction = switch (sortDirection.toLowerCase()) {
+            case "asc" -> SortDirection.ASC;
+            case "desc" -> SortDirection.DESC;
+            default -> throw new IllegalArgumentException("Invalid sort direction: " + sortDirection);
+        };
+        var result = beerService.findAll(new BeerQuery(page, size, sortBy, direction));
 
         return ResponseEntity.ok(mapper.toDto(result));
     }

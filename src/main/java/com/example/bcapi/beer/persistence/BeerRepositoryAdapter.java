@@ -7,6 +7,7 @@ import com.example.bcapi.beer.domain.BeerRepository;
 import com.example.bcapi.common.domain.Page;
 import com.example.bcapi.manufacturer.persistence.ManufacturerEntity;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -52,9 +53,16 @@ public class BeerRepositoryAdapter implements BeerRepository {
 
     @Override
     public Page<Beer> findAll(BeerQuery query) {
-        var pageRequest = PageRequest.of(query.page(), query.size(), Sort.by("name").ascending());
-
-        return mapper.toDomain(jpaRepository.findAll(pageRequest));
+        var direction = switch (query.sortDirection()) {
+            case ASC -> Sort.Direction.ASC;
+            case DESC -> Sort.Direction.DESC;
+        };
+        var pageRequest = PageRequest.of(query.page(), query.size(), Sort.by(direction, query.sortBy()));
+        try {
+            return mapper.toDomain(jpaRepository.findAll(pageRequest));
+        } catch (PropertyReferenceException e) {
+            throw new IllegalArgumentException("Invalid sort field: " + query.sortBy());
+        }
     }
 
     @Override

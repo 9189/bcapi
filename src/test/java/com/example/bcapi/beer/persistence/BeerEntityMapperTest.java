@@ -1,8 +1,8 @@
 package com.example.bcapi.beer.persistence;
 
 import com.example.bcapi.beer.domain.Beer;
-import com.example.bcapi.beer.domain.BeerType;
 import com.example.bcapi.beer.domain.BeerDraft;
+import com.example.bcapi.beer.domain.BeerType;
 import com.example.bcapi.manufacturer.domain.Manufacturer;
 import com.example.bcapi.manufacturer.persistence.ManufacturerEntity;
 import com.example.bcapi.manufacturer.persistence.ManufacturerEntityMapper;

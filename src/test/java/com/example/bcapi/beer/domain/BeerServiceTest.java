@@ -1,6 +1,5 @@
 package com.example.bcapi.beer.domain;
 
-import com.example.bcapi.beer.domain.BeerType;
 import com.example.bcapi.common.domain.Page;
 import com.example.bcapi.manufacturer.domain.Manufacturer;
 import com.example.bcapi.manufacturer.domain.ManufacturerNotFoundException;
@@ -121,7 +120,7 @@ class BeerServiceTest {
 
     @Test
     void findAll_returnsPage() {
-        var query = new BeerQuery(0, 20);
+        var query = new BeerQuery(0, 20, "name", SortDirection.ASC);
         var beer = new Beer(UUID.randomUUID(), "Zipfer Urquell", BeerType.LAGER, 5.0, "A classic lager", manufacturer, now(), now());
         var page = new Page<>(List.of(beer), 0, 20, false);
         when(beerRepository.findAll(query)).thenReturn(page);
