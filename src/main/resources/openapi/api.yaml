@@ -21,14 +21,14 @@ paths:
       operationId: getBeers
       summary: Get all beers
       parameters:
-        - name: offset
+        - name: page
           in: query
           required: false
           schema:
             type: integer
             default: 0
             minimum: 0
-        - name: limit
+        - name: size
           in: query
           required: false
           schema:
@@ -145,14 +145,14 @@ paths:
       operationId: getManufacturers
       summary: Get all manufacturers
       parameters:
-        - name: offset
+        - name: page
           in: query
           required: false
           schema:
             type: integer
             default: 0
             minimum: 0
-        - name: limit
+        - name: size
           in: query
           required: false
           schema:
@@ -404,9 +404,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Beer'
-        offset:
+        page:
           type: integer
-        limit:
+        size:
           type: integer
         hasMore:
           type: boolean
@@ -418,9 +418,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Manufacturer'
-        offset:
+        page:
           type: integer
-        limit:
+        size:
           type: integer
         hasMore:
           type: boolean

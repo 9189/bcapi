@@ -1,5 +1,6 @@
 package com.example.bcapi.manufacturer.persistence;
 
+import com.example.bcapi.common.domain.Page;
 import com.example.bcapi.manufacturer.domain.Manufacturer;
 import com.example.bcapi.manufacturer.domain.ManufacturerDraft;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,15 @@ class ManufacturerEntityMapper {
                 entity.getOriginCountry(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
+        );
+    }
+
+    Page<Manufacturer> toDomain(org.springframework.data.domain.Page<ManufacturerEntity> page) {
+        return new Page<>(
+                page.map(this::toDomain).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.hasNext()
         );
     }
 
