@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.time.OffsetDateTime.now;
+
 @Component
 class ManufacturerDbHelper {
 
@@ -21,5 +23,14 @@ class ManufacturerDbHelper {
 
     int count() {
         return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM manufacturers", Integer.class);
+    }
+
+    UUID insert(String name, String originCountry) {
+        var id = UUID.randomUUID();
+        jdbcTemplate.update(
+                "INSERT INTO manufacturers (id, name, origin_country, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+                id, name, originCountry, now(), now()
+        );
+        return id;
     }
 }

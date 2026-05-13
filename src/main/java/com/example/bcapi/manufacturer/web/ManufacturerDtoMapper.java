@@ -1,9 +1,11 @@
 package com.example.bcapi.manufacturer.web;
 
+import com.example.bcapi.common.domain.Page;
 import com.example.bcapi.manufacturer.domain.Manufacturer;
 import com.example.bcapi.manufacturer.domain.ManufacturerDraft;
 import com.example.bcapi.model.ManufacturerCreateRequestDto;
 import com.example.bcapi.model.ManufacturerDto;
+import com.example.bcapi.model.ManufacturerPageDto;
 import com.example.bcapi.model.ManufacturerUpdateRequestDto;
 import org.springframework.stereotype.Component;
 
@@ -20,17 +22,25 @@ public class ManufacturerDtoMapper {
                 .updatedAt(manufacturer.updatedAt());
     }
 
-    ManufacturerDraft toDomain(ManufacturerCreateRequestDto request) {
+    ManufacturerPageDto toDto(Page<Manufacturer> page) {
+        return new ManufacturerPageDto()
+                .items(page.items().stream().map(this::toDto).toList())
+                .page(page.page())
+                .size(page.size())
+                .hasMore(page.hasMore());
+    }
+
+    ManufacturerDraft toDomain(ManufacturerCreateRequestDto dto) {
         return new ManufacturerDraft(
-                request.getName(),
-                request.getOriginCountry()
+                dto.getName(),
+                dto.getOriginCountry()
         );
     }
 
-    ManufacturerDraft toDomain(ManufacturerUpdateRequestDto request) {
+    ManufacturerDraft toDomain(ManufacturerUpdateRequestDto dto) {
         return new ManufacturerDraft(
-                request.getName(),
-                request.getOriginCountry()
+                dto.getName(),
+                dto.getOriginCountry()
         );
     }
 }
