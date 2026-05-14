@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bcapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bcapi
+  template:
+    metadata:
+      labels:
+        app: bcapi
+    spec:
+      containers:
+        - name: bcapi
+          image: "bcapi:{{ .Values.image.tag }}"
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            {{- range $i, $user := .Values.security.users }}
+            - name: APP_SECURITY_USERS_{{ $i }}_USERNAME
+              value: {{ $user.username | quote }}
+            - name: APP_SECURITY_USERS_{{ $i }}_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bcapi-user-secret
+                  key: {{ $user.username }}-password
+            - name: APP_SECURITY_USERS_{{ $i }}_ROLE
+              value: {{ $user.role | quote }}
+            {{- end }}

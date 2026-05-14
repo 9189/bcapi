@@ -1,0 +1,9 @@
+image:
+  tag: 0.1.0
+
+security:
+  users:
+    - username: admin
+      role: ADMIN
+    - username: manufacturer
+      role: MANUFACTURER
