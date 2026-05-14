@@ -1,0 +1,16 @@
+app:
+  security:
+    users:
+      - username: admin
+        password: admin
+        role: ADMIN
+      - username: manufacturer
+        password: manufacturer
+        role: MANUFACTURER
+      - username: brewer
+        password: brewer
+        role: MANUFACTURER
+
+spring:
+  liquibase:
+    contexts: demo

@@ -4,6 +4,8 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  liquibase:
+    contexts: default
 
 springdoc:
   api-docs:

@@ -1,0 +1,9 @@
+app:
+  security:
+    users:
+      - username: admin
+        password: admin
+        role: ADMIN
+      - username: manufacturer
+        password: manufacturer
+        role: MANUFACTURER
