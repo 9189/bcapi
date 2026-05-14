@@ -87,6 +87,12 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '409':
+          description: Beer with the same name already exists for this manufacturer
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           description: Invalid beer type
           content:
@@ -146,6 +152,12 @@ paths:
                 $ref: '#/components/schemas/Problem'
         '404':
           description: Beer not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Beer with the same name already exists for this manufacturer
           content:
             application/problem+json:
               schema:
@@ -223,6 +235,12 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '409':
+          description: Manufacturer with the same name and country already exists
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           description: Invalid country code
           content:
@@ -282,6 +300,12 @@ paths:
                 $ref: '#/components/schemas/Problem'
         '404':
           description: Manufacturer not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Manufacturer with the same name and country already exists
           content:
             application/problem+json:
               schema:
