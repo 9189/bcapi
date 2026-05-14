@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-unique-constraints
+      author: Joe Martin
+      changes:
+        - addUniqueConstraint:
+            tableName: manufacturers
+            columnNames: name, origin_country
+            constraintName: uq_manufacturers_name_country
+
+        - addUniqueConstraint:
+            tableName: beers
+            columnNames: name, manufacturer_id
+            constraintName: uq_beers_name_manufacturer
