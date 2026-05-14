@@ -434,6 +434,20 @@ curl -X DELETE http://localhost:8080/api/beers/b0000000-0000-0000-0000-000000000
 
 ---
 
+## Not Implemented
+
+### Beer Picture Upload
+
+Each beer could expose a picture as an image sub-resource: `POST /api/beers/{id}/picture` accepting `multipart/form-data`, and `GET /api/beers/{id}/picture` to retrieve it. The picture URL would be stored alongside the beer record.
+
+Locally and in Docker, images would be written to the filesystem. In a production environment the upload would be delegated to an S3 bucket; the application writes to S3 and stores the resulting object URL, keeping binary data out of the database. The API contract stays identical across environments; only the backing storage changes.
+
+### AWS-Hosted Database (RDS)
+
+Connecting to a PostgreSQL instance on AWS RDS requires swapping the H2 datasource configuration for a Postgres JDBC URL, username, and password. The credentials would follow the same pattern already in place for user passwords: stored as a Kubernetes Secret out-of-band and referenced in the Helm deployment via `secretKeyRef`. A `values.yaml` entry for the RDS endpoint (non-sensitive) and a secret reference for the credentials is all the wiring needed. The application code and migrations require no changes.
+
+---
+
 ## AI Usage Log
 
 | Tool                            | Summary                                                                                      |
