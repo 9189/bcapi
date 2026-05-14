@@ -18,6 +18,14 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
           env:
             {{- range $i, $user := .Values.security.users }}
             - name: APP_SECURITY_USERS_{{ $i }}_USERNAME
