@@ -1,0 +1,210 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-seed-data
+      author: Joe Martin
+      context: demo
+      changes:
+
+        # Manufacturers
+
+        - insert:
+            tableName: manufacturers
+            columns:
+              - column: { name: id,             value: 'a0000000-0000-0000-0000-000000000001' }
+              - column: { name: name,            value: 'Heineken' }
+              - column: { name: origin_country,  value: 'NL' }
+              - column: { name: created_at,      valueDate: 'now()' }
+              - column: { name: updated_at,      valueDate: 'now()' }
+
+        - insert:
+            tableName: manufacturers
+            columns:
+              - column: { name: id,             value: 'a0000000-0000-0000-0000-000000000002' }
+              - column: { name: name,            value: 'BrewDog' }
+              - column: { name: origin_country,  value: 'GB' }
+              - column: { name: owner,           value: 'manufacturer' }
+              - column: { name: created_at,      valueDate: 'now()' }
+              - column: { name: updated_at,      valueDate: 'now()' }
+
+        - insert:
+            tableName: manufacturers
+            columns:
+              - column: { name: id,             value: 'a0000000-0000-0000-0000-000000000003' }
+              - column: { name: name,            value: 'Estrella Galicia' }
+              - column: { name: origin_country,  value: 'ES' }
+              - column: { name: owner,           value: 'manufacturer' }
+              - column: { name: created_at,      valueDate: 'now()' }
+              - column: { name: updated_at,      valueDate: 'now()' }
+
+        - insert:
+            tableName: manufacturers
+            columns:
+              - column: { name: id,             value: 'a0000000-0000-0000-0000-000000000004' }
+              - column: { name: name,            value: 'Bayerische Staatsbrauerei Weihenstephan' }
+              - column: { name: origin_country,  value: 'DE' }
+              - column: { name: created_at,      valueDate: 'now()' }
+              - column: { name: updated_at,      valueDate: 'now()' }
+
+        - insert:
+            tableName: manufacturers
+            columns:
+              - column: { name: id,             value: 'a0000000-0000-0000-0000-000000000005' }
+              - column: { name: name,            value: 'Sierra Nevada Brewing Co.' }
+              - column: { name: origin_country,  value: 'US' }
+              - column: { name: owner,           value: 'brewer' }
+              - column: { name: created_at,      valueDate: 'now()' }
+              - column: { name: updated_at,      valueDate: 'now()' }
+
+        # Heineken beers
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000001' }
+              - column: { name: name,             value: 'Heineken Lager' }
+              - column: { name: type,             value: 'LAGER' }
+              - column: { name: abv,              valueNumeric: 5.0 }
+              - column: { name: description,      value: 'The world-famous Dutch pale lager.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000001' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000002' }
+              - column: { name: name,             value: 'Amstel' }
+              - column: { name: type,             value: 'LAGER' }
+              - column: { name: abv,              valueNumeric: 5.0 }
+              - column: { name: description,      value: 'Crisp Dutch lager brewed since 1870.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000001' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        # BrewDog beers
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000003' }
+              - column: { name: name,             value: 'Punk IPA' }
+              - column: { name: type,             value: 'IPA' }
+              - column: { name: abv,              valueNumeric: 5.6 }
+              - column: { name: description,      value: 'Post-modern classic. Bitter, fresh and hoppy.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000002' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000004' }
+              - column: { name: name,             value: 'Hazy Jane' }
+              - column: { name: type,             value: 'DOUBLE_IPA' }
+              - column: { name: abv,              valueNumeric: 7.2 }
+              - column: { name: description,      value: 'Hazy, unfiltered New England IPA.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000002' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000005' }
+              - column: { name: name,             value: 'Lost Lager' }
+              - column: { name: type,             value: 'PILSNER' }
+              - column: { name: abv,              valueNumeric: 4.7 }
+              - column: { name: description,      value: 'Dry-hopped pilsner with a clean bitter finish.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000002' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000006' }
+              - column: { name: name,             value: 'Dead Pony Club' }
+              - column: { name: type,             value: 'SESSION_IPA' }
+              - column: { name: abv,              valueNumeric: 3.8 }
+              - column: { name: description,      value: 'Ride hard, drink easy. A low-ABV hop bomb.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000002' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        # Estrella Galicia beers
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000007' }
+              - column: { name: name,             value: 'Estrella Galicia' }
+              - column: { name: type,             value: 'LAGER' }
+              - column: { name: abv,              valueNumeric: 5.5 }
+              - column: { name: description,      value: 'Premium Spanish lager brewed in Galicia since 1906.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000003' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000008' }
+              - column: { name: name,             value: 'Estrella Galicia 1906' }
+              - column: { name: type,             value: 'LAGER' }
+              - column: { name: abv,              valueNumeric: 6.5 }
+              - column: { name: description,      value: 'Reserve lager with a stronger, richer character.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000003' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        # Weihenstephan beers
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000009' }
+              - column: { name: name,             value: 'Hefeweissbier' }
+              - column: { name: type,             value: 'HEFEWEIZEN' }
+              - column: { name: abv,              valueNumeric: 5.4 }
+              - column: { name: description,      value: 'The original Bavarian wheat beer. Brewed since 1040.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000004' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000010' }
+              - column: { name: name,             value: 'Korbinian' }
+              - column: { name: type,             value: 'DOPPELBOCK' }
+              - column: { name: abv,              valueNumeric: 7.4 }
+              - column: { name: description,      value: 'Rich, malty Doppelbock named after the founder of Weihenstephan.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000004' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        # Sierra Nevada beers
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000011' }
+              - column: { name: name,             value: 'Sierra Nevada Pale Ale' }
+              - column: { name: type,             value: 'PALE_ALE' }
+              - column: { name: abv,              valueNumeric: 5.6 }
+              - column: { name: description,      value: 'The beer that launched the American craft brewing revolution.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000005' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
+
+        - insert:
+            tableName: beers
+            columns:
+              - column: { name: id,              value: 'b0000000-0000-0000-0000-000000000012' }
+              - column: { name: name,             value: 'Torpedo Extra IPA' }
+              - column: { name: type,             value: 'IPA' }
+              - column: { name: abv,              valueNumeric: 7.2 }
+              - column: { name: description,      value: 'Bold West Coast IPA with pine, citrus and resin.' }
+              - column: { name: manufacturer_id,  value: 'a0000000-0000-0000-0000-000000000005' }
+              - column: { name: created_at,       valueDate: 'now()' }
+              - column: { name: updated_at,       valueDate: 'now()' }
