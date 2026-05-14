@@ -33,4 +33,13 @@ public class ManufacturerDbHelper {
         );
         return id;
     }
+
+    public UUID insertWithOwner(String name, String originCountry, String owner) {
+        var id = UUID.randomUUID();
+        jdbcTemplate.update(
+                "INSERT INTO manufacturers (id, name, origin_country, owner, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+                id, name, originCountry, owner, now(), now()
+        );
+        return id;
+    }
 }

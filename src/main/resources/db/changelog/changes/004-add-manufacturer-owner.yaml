@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-add-manufacturer-owner
+      author: Joe Martin
+      changes:
+        - addColumn:
+            tableName: manufacturers
+            columns:
+              - column:
+                  name: owner
+                  type: varchar(255)

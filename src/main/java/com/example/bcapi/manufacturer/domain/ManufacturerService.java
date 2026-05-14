@@ -1,6 +1,7 @@
 package com.example.bcapi.manufacturer.domain;
 
 import com.example.bcapi.common.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,12 +19,13 @@ public class ManufacturerService {
         this.countryCodeValidator = countryCodeValidator;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Manufacturer create(ManufacturerDraft draft) {
         countryCodeValidator.validate(draft.originCountry());
-
         return manufacturerRepository.create(draft);
     }
 
+    @PreAuthorize("hasPermission(#id, 'Manufacturer', 'write')")
     public Manufacturer update(UUID id, ManufacturerDraft draft) {
         countryCodeValidator.validate(draft.originCountry());
         Manufacturer existingManufacturer = findById(id);
@@ -34,10 +36,10 @@ public class ManufacturerService {
                 existingManufacturer.createdAt(),
                 existingManufacturer.updatedAt()
         );
-
         return manufacturerRepository.update(manufacturerToSave);
     }
 
+    @PreAuthorize("hasPermission(#id, 'Manufacturer', 'write')")
     public void delete(UUID id) {
         manufacturerRepository.delete(id);
     }

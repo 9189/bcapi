@@ -24,6 +24,9 @@ public class ManufacturerEntity {
     @Column(name = "origin_country")
     private String originCountry;
 
+    @Column(updatable = false)
+    private String owner;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
@@ -33,10 +36,6 @@ public class ManufacturerEntity {
     private OffsetDateTime updatedAt;
 
     protected ManufacturerEntity() {}
-
-    public ManufacturerEntity(UUID id) {
-        this.id = id;
-    }
 
     public ManufacturerEntity(String name, String originCountry) {
         this.name = name;

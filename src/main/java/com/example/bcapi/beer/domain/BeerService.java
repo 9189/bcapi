@@ -2,6 +2,7 @@ package com.example.bcapi.beer.domain;
 
 import com.example.bcapi.common.domain.Page;
 import com.example.bcapi.manufacturer.domain.ManufacturerService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +20,13 @@ public class BeerService {
         this.manufacturerService = manufacturerService;
     }
 
+    @PreAuthorize("hasPermission(#draft.manufacturerId, 'Manufacturer', 'write')")
     public Beer create(BeerDraft draft) {
         manufacturerService.findById(draft.manufacturerId());
         return beerRepository.create(draft);
     }
 
+    @PreAuthorize("hasPermission(#id, 'Beer', 'write')")
     public Beer update(UUID id, BeerDraft draft) {
         Beer existing = findById(id);
         var manufacturer = manufacturerService.findById(draft.manufacturerId());
@@ -37,10 +40,10 @@ public class BeerService {
                 existing.createdAt(),
                 existing.updatedAt()
         );
-
         return beerRepository.update(beerToSave);
     }
 
+    @PreAuthorize("hasPermission(#id, 'Beer', 'write')")
     public void delete(UUID id) {
         beerRepository.delete(id);
     }

@@ -31,6 +31,7 @@ class BeerIT {
         var manufacturerId = manufacturerDb.insert("Heineken", "NL");
 
         var result = restTestClient.post().uri("/api/beers")
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -60,6 +61,64 @@ class BeerIT {
     }
 
     @Test
+    void post_withoutAuth_returnsUnauthorized() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+
+        restTestClient.post().uri("/api/beers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Zipfer Urquell",
+                          "type": "LAGER",
+                          "abv": 4.8,
+                          "manufacturerId": "%s"
+                        }
+                        """.formatted(manufacturerId))
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void post_asLinkedManufacturerUser_returnsCreated() {
+        var manufacturerId = manufacturerDb.insertWithOwner("Heineken", "NL", "manufacturer");
+
+        restTestClient.post().uri("/api/beers")
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Zipfer Urquell",
+                          "type": "LAGER",
+                          "abv": 4.8,
+                          "description": "A classic lager",
+                          "manufacturerId": "%s"
+                        }
+                        """.formatted(manufacturerId))
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Test
+    void post_asUnlinkedManufacturerUser_returnsForbidden() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+
+        restTestClient.post().uri("/api/beers")
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Zipfer Urquell",
+                          "type": "LAGER",
+                          "abv": 4.8,
+                          "manufacturerId": "%s"
+                        }
+                        """.formatted(manufacturerId))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectHeader().contentType("application/problem+json");
+    }
+
+    @Test
     void get_existingId_returnsBeer() {
         var manufacturerId = manufacturerDb.insert("Heineken", "NL");
         var id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
@@ -84,6 +143,7 @@ class BeerIT {
         var id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
 
         restTestClient.put().uri("/api/beers/{id}", id)
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -105,11 +165,80 @@ class BeerIT {
     }
 
     @Test
+    void put_asUnlinkedManufacturerUser_returnsForbidden() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+        var id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+
+        restTestClient.put().uri("/api/beers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Zipfer Urquell Premium",
+                          "type": "LAGER",
+                          "abv": 5.2,
+                          "description": "An upgraded lager",
+                          "manufacturerId": "%s"
+                        }
+                        """.formatted(manufacturerId))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectHeader().contentType("application/problem+json");
+    }
+
+    @Test
+    void put_asLinkedManufacturerUser_returnsUpdated() {
+        var manufacturerId = manufacturerDb.insertWithOwner("Heineken", "NL", "manufacturer");
+        var id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+
+        restTestClient.put().uri("/api/beers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Zipfer Urquell Premium",
+                          "type": "LAGER",
+                          "abv": 5.2,
+                          "description": "An upgraded lager",
+                          "manufacturerId": "%s"
+                        }
+                        """.formatted(manufacturerId))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
     void delete_existingId_returnsNoContentAndRemoves() {
         var manufacturerId = manufacturerDb.insert("Heineken", "NL");
         var id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
 
         restTestClient.delete().uri("/api/beers/{id}", id)
+                .headers(h -> h.setBasicAuth("admin", "admin"))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        assertSoftly(softly -> softly.assertThat(db.count()).isZero());
+    }
+
+    @Test
+    void delete_asUnlinkedManufacturerUser_returnsForbidden() {
+        var manufacturerId = manufacturerDb.insert("Heineken", "NL");
+        var id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+
+        restTestClient.delete().uri("/api/beers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectHeader().contentType("application/problem+json");
+    }
+
+    @Test
+    void delete_asLinkedManufacturerUser_returnsNoContent() {
+        var manufacturerId = manufacturerDb.insertWithOwner("Heineken", "NL", "manufacturer");
+        var id = db.insert("Zipfer Urquell", "LAGER", 4.8, "A classic lager", manufacturerId);
+
+        restTestClient.delete().uri("/api/beers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
                 .exchange()
                 .expectStatus().isNoContent();
 
@@ -293,6 +422,7 @@ class BeerIT {
     @Test
     void post_missingRequiredField_returnsBadRequestWithProblemDetail() {
         var result = restTestClient.post().uri("/api/beers")
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -337,6 +467,7 @@ class BeerIT {
         var manufacturerId = manufacturerDb.insert("Heineken", "NL");
 
         var result = restTestClient.post().uri("/api/beers")
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -364,6 +495,7 @@ class BeerIT {
     @Test
     void post_unknownManufacturer_returnsNotFoundWithProblemDetail() {
         var result = restTestClient.post().uri("/api/beers")
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {

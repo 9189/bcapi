@@ -25,6 +25,7 @@ class ManufacturerIT {
     @Test
     void post_validRequest_returnsCreatedWithLocationAndPersists() {
         var result = restTestClient.post().uri("/api/manufacturers")
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -50,8 +51,39 @@ class ManufacturerIT {
     }
 
     @Test
+    void post_withoutAuth_returnsUnauthorized() {
+        restTestClient.post().uri("/api/manufacturers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Estrella Galicia",
+                          "originCountry": "ES"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void post_asManufacturerUser_returnsForbidden() {
+        restTestClient.post().uri("/api/manufacturers")
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Estrella Galicia",
+                          "originCountry": "ES"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectHeader().contentType("application/problem+json");
+    }
+
+    @Test
     void post_invalidCountryCode_returnsUnprocessableEntityWithProblemDetail() {
         var result = restTestClient.post().uri("/api/manufacturers")
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -77,6 +109,7 @@ class ManufacturerIT {
     @Test
     void post_missingRequiredField_returnsBadRequestWithProblemDetail() {
         var result = restTestClient.post().uri("/api/manufacturers")
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -138,6 +171,7 @@ class ManufacturerIT {
         var id = db.insert("Heineken", "NL");
 
         var result = restTestClient.put().uri("/api/manufacturers/{id}", id)
+                .headers(h -> h.setBasicAuth("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -159,10 +193,69 @@ class ManufacturerIT {
     }
 
     @Test
+    void put_asLinkedManufacturerUser_returnsUpdated() {
+        var id = db.insertWithOwner("Heineken", "NL", "manufacturer");
+
+        restTestClient.put().uri("/api/manufacturers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Heineken International",
+                          "originCountry": "NL"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void put_asUnlinkedManufacturerUser_returnsForbidden() {
+        var id = db.insert("Heineken", "NL");
+
+        restTestClient.put().uri("/api/manufacturers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                          "name": "Heineken International",
+                          "originCountry": "NL"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectHeader().contentType("application/problem+json");
+    }
+
+    @Test
     void delete_existingId_returnsNoContentAndRemoves() {
         var id = db.insert("Heineken", "NL");
 
         restTestClient.delete().uri("/api/manufacturers/{id}", id)
+                .headers(h -> h.setBasicAuth("admin", "admin"))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        assertSoftly(softly -> softly.assertThat(db.count()).isZero());
+    }
+
+    @Test
+    void delete_asUnlinkedManufacturerUser_returnsForbidden() {
+        var id = db.insertWithOwner("Heineken", "NL", "test");
+
+        restTestClient.delete().uri("/api/manufacturers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectHeader().contentType("application/problem+json");
+    }
+
+    @Test
+    void delete_asLinkedManufacturerUser_returnsNoContent() {
+        var id = db.insertWithOwner("Heineken", "NL", "manufacturer");
+
+        restTestClient.delete().uri("/api/manufacturers/{id}", id)
+                .headers(h -> h.setBasicAuth("manufacturer", "manufacturer"))
                 .exchange()
                 .expectStatus().isNoContent();
 
