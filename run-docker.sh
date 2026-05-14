@@ -5,9 +5,6 @@ APP_NAME="bcapi"
 IMAGE_NAME="bcapi:0.1.0"
 APP_PORT="8080"
 
-echo "Building Spring Boot application..."
-./mvnw clean package -DskipTests
-
 echo "Building Docker image..."
 docker build -t "$IMAGE_NAME" .
 

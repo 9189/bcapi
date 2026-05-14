@@ -37,7 +37,7 @@ Navigate to `http://localhost:8080/h2-console`. JDBC URL: `jdbc:h2:mem:testdb`.
 
 ### Docker
 
-**Prerequisites:** Java 25+, Maven 3.9+, Docker
+**Prerequisites:** Docker
 
 ```bash
 ./run-docker.sh
